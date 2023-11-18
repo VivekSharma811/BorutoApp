@@ -3,6 +3,8 @@ package com.hypheno.borutoapp.di
 import android.content.Context
 import androidx.room.Room
 import com.hypheno.borutoapp.data.local.BorutoDatabase
+import com.hypheno.borutoapp.data.repository.LocalDataSourceImpl
+import com.hypheno.borutoapp.domain.repository.LocalDataSource
 import com.hypheno.borutoapp.util.Constants.BORUTO_DATABASE
 import dagger.Module
 import dagger.Provides
@@ -24,5 +26,15 @@ object DatabaseModule {
         BorutoDatabase::class.java,
         BORUTO_DATABASE
     ).build()
+
+    @Provides
+    @Singleton
+    fun provideLocalDataSource(
+        database: BorutoDatabase
+    ): LocalDataSource {
+        return LocalDataSourceImpl(
+            borutoDatabase = database
+        )
+    }
 
 }
