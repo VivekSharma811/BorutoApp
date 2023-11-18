@@ -4,6 +4,7 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.MaterialTheme
@@ -21,7 +22,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.items
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.hypheno.borutoapp.domain.model.Hero
@@ -34,16 +37,60 @@ import com.hypheno.borutoapp.ui.theme.SMALL_PADDING
 import com.hypheno.borutoapp.ui.theme.topAppBarContentColor
 import com.hypheno.borutoapp.util.Constants.BASE_URL
 import com.hypheno.borutoapp.R
+import com.hypheno.borutoapp.presentation.components.ShimmerEffect
 
 @Composable
 fun ListContent(
     heroes: LazyPagingItems<Hero>,
     navController: NavHostController
 ) {
+    val result = handlePagingResult(heroes = heroes)
 
+    if(result){
+        LazyColumn(
+            contentPadding = PaddingValues(all = SMALL_PADDING),
+            verticalArrangement = Arrangement.spacedBy(SMALL_PADDING)
+        ) {
+            items(
+                items = heroes,
+                key = { hero ->
+                    hero.id
+                }
+            ) { hero ->
+                hero?.let {
+                    HeroItem(hero = it, navController = navController)
+                }
+            }
+        }
+    }
 }
 
-@ExperimentalCoilApi
+@Composable
+fun handlePagingResult(
+    heroes: LazyPagingItems<Hero>
+): Boolean {
+    heroes.apply {
+        val error = when {
+            loadState.refresh is LoadState.Error -> loadState.refresh as LoadState.Error
+            loadState.prepend is LoadState.Error -> loadState.prepend as LoadState.Error
+            loadState.append is LoadState.Error -> loadState.append as LoadState.Error
+            else -> null
+        }
+
+        return when {
+            loadState.refresh is LoadState.Loading -> {
+                ShimmerEffect()
+                false
+            }
+            error != null -> {
+                false
+            }
+            else -> true
+        }
+    }
+}
+
+@OptIn(ExperimentalCoilApi::class)
 @Composable
 fun HeroItem(
     hero: Hero,
@@ -62,7 +109,7 @@ fun HeroItem(
             },
         contentAlignment = Alignment.BottomStart
     ) {
-        Surface(shape = MaterialTheme.shapes.large) {
+        Surface(shape = RoundedCornerShape(size = LARGE_PADDING)) {
             Image(
                 modifier = Modifier.fillMaxSize(),
                 painter = painter,
@@ -128,8 +175,8 @@ fun HeroItemPreview() {
             id = 1,
             name = "Sasuke",
             image = "",
-            about = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-            rating = 4.5,
+            about = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
+            rating = 0.0,
             power = 100,
             month = "",
             day = "",
@@ -150,8 +197,8 @@ fun HeroItemDarkPreview() {
             id = 1,
             name = "Sasuke",
             image = "",
-            about = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-            rating = 4.5,
+            about = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ",
+            rating = 0.0,
             power = 100,
             month = "",
             day = "",
