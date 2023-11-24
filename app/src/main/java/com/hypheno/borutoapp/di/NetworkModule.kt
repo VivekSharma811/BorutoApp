@@ -17,6 +17,7 @@ import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import java.util.concurrent.TimeUnit
+import javax.inject.Named
 import javax.inject.Singleton
 
 @ExperimentalPagingApi
@@ -55,7 +56,7 @@ object NetworkModule {
     @Singleton
     fun provideRemoteDataSource(
         borutoApi: BorutoApi,
-        borutoDatabase: BorutoDatabase
+        @Named("main_db") borutoDatabase: BorutoDatabase
     ): RemoteDataSource {
         return RemoteDataSourceImpl(
             borutoApi = borutoApi,

@@ -11,6 +11,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -19,6 +20,7 @@ object DatabaseModule {
 
     @Provides
     @Singleton
+    @Named("main_db")
     fun provideDatabase(
         @ApplicationContext context: Context
     ) = Room.databaseBuilder(
@@ -30,7 +32,7 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideLocalDataSource(
-        database: BorutoDatabase
+        @Named("main_db") database: BorutoDatabase
     ): LocalDataSource {
         return LocalDataSourceImpl(
             borutoDatabase = database
