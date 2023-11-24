@@ -7,10 +7,10 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.*
 import androidx.paging.LoadState
 import androidx.compose.ui.Alignment
@@ -22,8 +22,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.paging.compose.LazyPagingItems
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.hypheno.borutoapp.R
 import com.hypheno.borutoapp.domain.model.Hero
 import com.hypheno.borutoapp.ui.theme.DarkGray
@@ -42,7 +40,7 @@ fun EmptyScreen(
         mutableStateOf("Find your Favorite Hero!")
     }
     var icon by remember {
-        mutableStateOf(R.drawable.ic_search_document)
+        mutableIntStateOf(R.drawable.ic_search_document)
     }
 
     if (error != null) {
@@ -54,8 +52,8 @@ fun EmptyScreen(
     val alphaAnim by animateFloatAsState(
         targetValue = if (startAnimation) ContentAlpha.disabled else 0f,
         animationSpec = tween(
-            durationMillis = 1000
-        )
+            durationMillis = 1000,
+        ), label = "Alpha Animation"
     )
     LaunchedEffect(key1 = true) {
         startAnimation = true
@@ -70,6 +68,7 @@ fun EmptyScreen(
     )
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun EmptyContent(
     alphaAnim: Float,
@@ -79,17 +78,29 @@ fun EmptyContent(
     heroes: LazyPagingItems<Hero>? = null
 ) {
     var isRefreshing by remember { mutableStateOf(false) }
-    SwipeRefresh(
-        swipeEnabled = error != null,
-        state = rememberSwipeRefreshState(isRefreshing),
+    val refreshState = rememberPullRefreshState(
+        refreshing = isRefreshing,
         onRefresh = {
             isRefreshing = true
             heroes?.refresh()
             isRefreshing = false
         }
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .pullRefresh(state = refreshState, enabled = error != null),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
     ) {
+        PullRefreshIndicator(
+            state = refreshState,
+            refreshing = isRefreshing
+        )
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .weight(1f)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center

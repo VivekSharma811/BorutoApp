@@ -10,11 +10,10 @@ import com.hypheno.borutoapp.data.remote.BorutoApi
 import com.hypheno.borutoapp.domain.model.Hero
 import com.hypheno.borutoapp.domain.model.HeroRemoteKeys
 import java.lang.Exception
-import javax.inject.Inject
 import javax.inject.Named
 
 @ExperimentalPagingApi
-class HeroRemoteMediator @Inject constructor(
+class HeroRemoteMediator(
     private val borutoApi: BorutoApi,
     @Named("main_db") private val borutoDatabase: BorutoDatabase
 ) : RemoteMediator<Int, Hero>() {

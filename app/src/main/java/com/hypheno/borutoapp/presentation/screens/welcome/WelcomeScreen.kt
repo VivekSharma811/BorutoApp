@@ -2,6 +2,7 @@ package com.hypheno.borutoapp.presentation.screens.welcome
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,17 +21,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
+import com.hypheno.borutoapp.presentation.components.HorizontalPagerIndicator
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.HorizontalPagerIndicator
-import com.google.accompanist.pager.PagerState
-import com.google.accompanist.pager.rememberPagerState
 import com.hypheno.borutoapp.R
 import com.hypheno.borutoapp.domain.model.OnBoardingPage
 import com.hypheno.borutoapp.navigation.Screen
@@ -47,8 +47,7 @@ import com.hypheno.borutoapp.ui.theme.welcomeScreenBackgroundColor
 import com.hypheno.borutoapp.util.Constants.LAST_ON_BOARDING_PAGE
 import com.hypheno.borutoapp.util.Constants.ON_BOARDING_PAGE_COUNT
 
-
-@ExperimentalPagerApi
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WelcomeScreen(
     navController: NavHostController,
@@ -60,7 +59,7 @@ fun WelcomeScreen(
         OnBoardingPage.Third
     )
 
-    val pagerState = rememberPagerState()
+    val pagerState = rememberPagerState(pageCount = { ON_BOARDING_PAGE_COUNT })
 
     Column(
         modifier = Modifier
@@ -70,7 +69,6 @@ fun WelcomeScreen(
         HorizontalPager(
             modifier = Modifier.weight(10f),
             state = pagerState,
-            count = ON_BOARDING_PAGE_COUNT,
             verticalAlignment = Alignment.Top
         ) { position ->
             PagerScreen(onBoardingPage = pages[position])
@@ -83,7 +81,8 @@ fun WelcomeScreen(
             activeColor = MaterialTheme.colors.activeIndicatorColor,
             inactiveColor = MaterialTheme.colors.inactiveIndicatorColor,
             indicatorWidth = PAGING_INDICATOR_WIDTH,
-            spacing = PAGING_INDICATOR_SPACING
+            spacing = PAGING_INDICATOR_SPACING,
+            pageCount = pagerState.pageCount
         )
         FinishButton(
             modifier = Modifier.weight(1f),
@@ -96,8 +95,7 @@ fun WelcomeScreen(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
-@ExperimentalPagerApi
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FinishButton(
     modifier: Modifier,
